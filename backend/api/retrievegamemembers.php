@@ -7,7 +7,7 @@
 
   $gameid = $data['gameid'] ?? null;
 
-  $stmt = $pdo->query("SELECT t.TeamID,tm.Usercode,u.Username, t.IsHomeTeam FROM wooyemo.teammember tm inner join team t on t.TeamID = tm.TeamID "
+  $stmt = $pdo->query("SELECT t.TeamID,tm.Usercode,u.Username, t.IsHomeTeam FROM teammember tm inner join team t on t.TeamID = tm.TeamID "
    . " inner join game g on t.GameID = g.GameID "
    . " inner join user u on tm.Usercode = u.Usercode "
    . " where g.GameID = " . $gameid . " order by IsHomeTeam desc, tm.TeamMemberID");

@@ -16,7 +16,9 @@ if (!$gameType || !$gameDate) {
 try {
     $stmt = $pdo->prepare("INSERT INTO game (GameDate, SportsCode) VALUES (?, ?)");
     $stmt->execute([$gameDate, $gameType]);
-    echo json_encode(['success' => true, 'message' => 'Game saved']);
+    $last_id = $pdo->lastInsertId();
+    //echo "$last_id:" . $last_id;
+    echo json_encode(['success' => true, 'message' => 'Game saved','id' => $last_id]);
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

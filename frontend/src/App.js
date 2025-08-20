@@ -1,19 +1,18 @@
 import './App.css';
-import {Link,Routes, Route} from 'react-router-dom';
-import History from './History';
+import {Routes, Route} from 'react-router-dom';
 import Game from './Game';
 import Main from './Main';
 import Team from './Team';
-import React, {useEffect, useState} from 'react';
+import Score from './Score';
 
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Main />} />
-      <Route path="/History" element={<History />}/>
       <Route path="/Game" element={<Game />}/>
-      <Route path="/Team/:gameid" element={<Team />}/>
+      <Route path="/Team" element={<Team />}/>
+      <Route path="/Score" element={<Score />} />
     </Routes>
   )
 }

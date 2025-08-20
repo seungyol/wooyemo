@@ -24,7 +24,7 @@ try {
   $hometeamexist = $stmt->fetchColumn();
 
   if($hometeamexist != 1){
-    $stmt = $pdo->prepare("INSERT INTO Team (GameID, IsHomeTeam) VALUES (:gameid, :ishometeam)");
+    $stmt = $pdo->prepare("INSERT INTO team (GameID, IsHomeTeam) VALUES (:gameid, :ishometeam)");
     $stmt->bindParam(':gameid', $gameid, PDO::PARAM_INT);
     $stmt->bindParam(':ishometeam', $ishometeam, PDO::PARAM_INT);
     $stmt->execute();
@@ -36,7 +36,7 @@ try {
   
   $isawayteam = 0;
   if(!$stmt->fetchColumn()){
-    $stmt = $pdo->prepare("INSERT INTO Team (GameID, IsHomeTeam) VALUES (:gameid, :ishometeam)");
+    $stmt = $pdo->prepare("INSERT INTO team (GameID, IsHomeTeam) VALUES (:gameid, :ishometeam)");
     $stmt->bindParam(':gameid', $gameid, PDO::PARAM_INT);
     $stmt->bindParam(':ishometeam', $isawayteam, PDO::PARAM_INT);
     $stmt->execute();
@@ -48,7 +48,7 @@ try {
   $stmt->execute();
 
   //Read teamid for home team and away team
-  $stmt = $pdo->prepare('select TeamID, IsHomeTeam from wooyemo.team where gameid = :gameid');
+  $stmt = $pdo->prepare('select TeamID, IsHomeTeam from team where gameid = :gameid');
   $stmt->bindParam(':gameid', $gameid, PDO::PARAM_INT);
   $stmt->execute();
   while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -58,6 +58,7 @@ try {
       $awayteamid = $row["TeamID"];
     }    
   }
+  
   //Insert home members 
   $stmt = $pdo->prepare("INSERT INTO teammember (teamid, usercode) VALUES (:teamid, :usercode)");
   foreach($homeMembers as $m) {

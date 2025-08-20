@@ -1,34 +1,38 @@
-import {Link,Routes, Route} from 'react-router-dom';
+import {Link,Routes, Route,useNavigate} from 'react-router-dom';
 import {useEffect,useState} from 'react';
-import Team from './Team';
+
 export default function Main(){
   const [games, setGames] = useState([]);
-  const [selectedGame, setSelectedGame] = useState('');
-
+  const navigate = useNavigate();
+  
   useEffect(()=> {
-   fetch('http://localhost/api/retrievegames.php')
+   fetch('/api/retrievegames.php')
     .then(res => res.json())
     .then(data => setGames(data)); 
   }, []);
 
-  
+  function goToTeam(id, details){
+    navigate('Team', {
+      state: {id: id, details: details}
+    });
+  }  
 
-  const gamesTRs = games.map(m => <tr><td>{m.GameID}</td><td>{m.GameDate}</td><td>{m.SportsName}</td><td>{m.NoOfGames}</td><td><Link to={`Team/${m.GameID}`}>Team</Link></td></tr>);
-  console.log('gamesTRs',gamesTRs);
+  const gamesTRs = games.map(m => <tr><td>{m.GameID}</td><td>{m.GameDate}</td><td><button className='btn btn-link' onClick={()=> goToTeam(m.GameID, m.SportsName + ' ' + m.GameDate)}>{m.SportsName}</button></td><td className='text-end'>{m.NoOfGames}</td>
+    </tr>);
+  
   return (
     <div className='container'>
       <div className='row'>
-        <h1>Games</h1>
+        <h1 className='text-center'>Wooyemo Game History</h1>
       </div>
       <div classsName='row'>
         <table className='table'>
           <thead>
             <tr>
-              <th>Game ID</th>
+              <th>ID</th>
               <th>Game date</th>
               <th>Game</th>
-              <th>No of games</th>
-              <th>Team</th>
+              <th className='text-end'>Games Played</th>
             </tr>
           </thead>
           <tbody>

@@ -7,20 +7,28 @@ export default function Game() {
   const navigate = useNavigate(); //initialize navigate
   const [selectedGameType, setSelectedGameType] = useState('');
   const [selectedGameDate, setSelectedGameDate] = useState('');  
-
+  const [selectedGameTypeName, setSelectedGameTypeName] = useState('');
   useEffect(() => {
 
-   fetch('http://localhost/api/gametype.php')
+   fetch('/api/gametype.php')
     .then(res => res.json())
     .then(data => setGameTypes(data));
   
-  }, [])
+  }, []);
+
+  const changeGameType = (ev) => {
+    console.log(ev.target.value);
+    console.log(ev.target.selectedIndex);
+    console.log(ev.target.options[ev.target.selectedIndex].text);
+    setSelectedGameType(ev.target.value);
+    setSelectedGameTypeName(ev.target.options[ev.target.selectedIndex].text);
+  };
  
   const saveGame = ()=>{
     const gameType = selectedGameType; // Replace with your state variable for selected game type
     const gameDate = selectedGameDate; // Replace with your state variable for selected game date
 
-    fetch('http://localhost/api/savegame.php', {
+    fetch('/api/savegame.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -34,7 +42,8 @@ export default function Game() {
     .then(data => {
       if (data.success) {
         alert('Game saved!');
-        navigate('/Team');
+        navigate('/Team', {
+          state: {id: data.id, details: selectedGameTypeName + " " + gameDate}});
       } else {
         alert('Error: ' + data.message);
       }
@@ -49,19 +58,31 @@ export default function Game() {
   return (
     <div className="container">
       <div className="row game-type">
-        <label className='text-end col form-label'>Game Type</label>
-        <select className='col form-control'  value={selectedGameType} onChange={e => setSelectedGameType(e.target.value)}>
-          <option>Select</option>
-          {gameTypeOptions}
-        </select>
+        <div className='col'>
+          <label className='text-end form-label'>Game Type</label>
+        </div>
+        <div className='col'>  
+          <select className='form-control'  value={selectedGameType} onChange={e => changeGameType(e)}>
+            <option>Select</option>
+            {gameTypeOptions}
+          </select>
+        </div>
       </div>
       <div className='row'>
-        <label className='text-end col form-label'>Game Date: </label>
-        <input className='col form-control' type='date' value={selectedGameDate} onChange={e => setSelectedGameDate(e.target.value)}/>
+        <div className='col'>
+          <label className='text-end form-label'>Game Date: </label>
+        </div>
+        <div className='col'>
+          <input className='form-control' type='date' value={selectedGameDate} onChange={e => setSelectedGameDate(e.target.value)}/>
+        </div>
       </div>
-      <div className="game-alloc-action">
-        <button className='btn btn-primary' onClick={saveGame}>Save</button>
-        <Link className='btn btn-secondary' to='/'>Back</Link>
+      <div className="row mt-3">
+        <div className='col'>
+          <button className='col btn btn-primary' onClick={saveGame}>Save</button>
+        </div>
+        <div className='col text-end'>
+          <Link className='btn btn-light' to='/'>Back</Link>
+        </div>           
       </div>      
     </div>
   );

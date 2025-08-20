@@ -1,59 +1,36 @@
 import { useEffect,useState} from "react";
-import {Link,useParams} from 'react-router-dom';
+import {Link,useParams,useNavigate,useLocation} from 'react-router-dom';
+import CheckboxGroup from './CheckboxGroup';
 
 const Team = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {id,details} = location.state;
+
   const [members, setMembers] = useState([]);
-  const [games, setGames] = useState([]);
   const [gameMembers, setGameMembers] = useState([]);
-  const [selectedGame, setSelectedGame] = useState('');
   const [homeMembers, setHomeMembers] = useState([]);
   const [awayMembers, setAwayMembers] = useState([]);
-  let { gameid } = useParams();
-
-//  setSelectedGame(gameid);
-  console.log('gameid:',gameid);
+  
   useEffect(() => {
-   fetch('http://localhost/api/user.php')
+   fetch('/api/user.php')
     .then(res => res.json())
     .then(data => setMembers(data));
-
-   fetch('http://localhost/api/retrievegames.php')
-    .then(res => res.json())
-    .then(data => setGames(data));
   
-    retrieveGameMembers(gameid);
+    retrieveGameMembers(id);
   }, []);
 
   useEffect(() => {
-    console.log('gameMembers updated:', gameMembers);
-    const hMembers = gameMembers.filter(m=> m.IsHomeTeam === 1).map(m=>m.Usercode);
-    const aMembers = gameMembers.filter(m=> m.IsHomeTeam === 0).map(m=>m.Usercode);
+    const hMembers = gameMembers.filter(m=> parseInt(m.IsHomeTeam) === 1).map(m=>m.Usercode);
+    const aMembers = gameMembers.filter(m=> parseInt(m.IsHomeTeam) === 0).map(m=>m.Usercode);
+    
     setHomeMembers(hMembers);
     setAwayMembers(aMembers);
-
   }, [gameMembers]);
-  
-  useEffect(()=> {
-    console.log('HOME Members',homeMembers);
-  },[homeMembers]);
-  useEffect(()=> {
-    console.log('AWAY Members',awayMembers);
-  },[awayMembers]);
-
-  const handleHomeSelect = (event) => {
-    const selected = Array.from(event.target.selectedOptions, option=> option.value);
-    setHomeMembers(selected);
-  }
-
-  const handleAwaySelect = (event) => {
-    const selected = Array.from(event.target.selectedOptions, option=> option.value);
-    setAwayMembers(selected);
-  }
 
   function retrieveGameMembers(id){   
-    //setSelectedGame(id);
     if(id !== ''){
-      fetch('http://localhost/api/retrievegamemembers.php', {
+      fetch('/api/retrievegamemembers.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -65,23 +42,21 @@ const Team = () => {
       .then(res => res.json())
       .then(data => {
         setGameMembers(data);
-        console.log('data', data);
       });
     }else{
       setGameMembers([]);
     }
-    gameid = id;
+    //gameid = id;
   }
 
   function saveTeams(){
-    //gameid, homeMembers, awayMembers
-    fetch('http://localhost/api/saveTeams.php', {
+    fetch('/api/saveTeams.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        gameid: gameid,
+        gameid: id,
         homeMembers: homeMembers,
         awayMembers: awayMembers
       })
@@ -90,7 +65,9 @@ const Team = () => {
     .then(data => {
       if (data.success) {
         alert('Team saved!');
-        //navigate('/Team');
+        navigate('/Team', {
+          state: {id: id, details: details}
+        });        
       } else {
         alert('Error: ' + data.message);
       }
@@ -100,39 +77,52 @@ const Team = () => {
     });  
   }
 
-
+  function goToScore(){
+    navigate('/Score', {
+        state: {game: id, details: details}
+      }
+    );
+  }
  
   
-  const memberOptions = members.map(m => <option value={m.usercode} >{m.username}</option>);
-  const gamesOptions = games.map(m=> <option value={m.GameID} key={m.GameID}>{m.SportsName} at {m.GameDate}</option>);
+  const memberOptions = members.map(m => {
+    return {
+      'value': m.usercode , 
+      'label': m.username
+    }
+  }); 
 
   return (
     <div className="container">
       <div className="row">
-        <label className="col text-end"> Select a Game</label>
-        <select className='col form-control' value={gameid} onChange={(e)=> {retrieveGameMembers(e.target.value);}}>
-          <option value=''>Select</option>
-          {gamesOptions}
-        </select>
+        <h2 className="col text-center">{details}</h2>
       </div>
-      <div className="teams">
-        <div className="team">
-          <label>Home Team </label>
-          <select className='form-control' multiple value={homeMembers} onChange={handleHomeSelect} >
-            {memberOptions}
-          </select>
+      <div className="row">
+        <div className="col-6">
+          <h3>Home</h3>
         </div>
-        <div className="team">
-          <label>Away Team</label>
-          <select className='form-control' multiple value={awayMembers} onChange={handleAwaySelect}>
-            {memberOptions}
-          </select>
+        <div className="col-6">
+          <h3>Away</h3>
         </div>
       </div>
-      <div className="team-alloc-action">
-        <Link className='btn btn-default' to="/Game">New Game</Link>
-        <button className='btn btn-primary' onClick={saveTeams}>Save</button>
-        <Link to='/'>Back to Game history</Link>
+      <div className="row">
+        <div className="col-6">
+          <CheckboxGroup title='Home' options={memberOptions} selected={homeMembers} onChange={setHomeMembers} />
+        </div>
+        <div className="col-6">     
+          <CheckboxGroup title='Away' options={memberOptions} selected={awayMembers} onChange={setAwayMembers} />
+        </div>
+      </div>
+      <div className="row mt-3">
+        <div className="col-4">
+          <button className='btn btn-success' onClick={goToScore}>Record Score</button>
+        </div>
+        <div className="col-4">
+          <button className='btn btn-primary' onClick={saveTeams}>Save</button>  
+        </div>
+        <div className="col-4">
+          <Link className='btn btn-light' to='/'>Back</Link>  
+        </div>
       </div>
     </div>
   );
