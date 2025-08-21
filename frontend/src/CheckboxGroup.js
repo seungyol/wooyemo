@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-
 const CheckboxGroup = ({title, options, selected, onChange }) => {
   const handleCheckboxChange = (value) => {
     if (selected.includes(value)) {

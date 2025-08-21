@@ -1,5 +1,5 @@
 import { useEffect,useState} from "react";
-import {Link,useParams,useNavigate,useLocation} from 'react-router-dom';
+import {Link,useNavigate,useLocation} from 'react-router-dom';
 import CheckboxGroup from './CheckboxGroup';
 
 const Team = () => {
@@ -18,7 +18,7 @@ const Team = () => {
     .then(data => setMembers(data));
   
     retrieveGameMembers(id);
-  }, []);
+  });
 
   useEffect(() => {
     const hMembers = gameMembers.filter(m=> parseInt(m.IsHomeTeam) === 1).map(m=>m.Usercode);

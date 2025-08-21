@@ -1,18 +1,17 @@
-import {Link, useLocation,useNavigate} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {useState,useEffect} from 'react';
 function Score(){
   const location = useLocation();
-  const navigate = useNavigate();
   let {game,details} = location.state;
   const [homePoint, setHomePoint] = useState(0);
   const [awayPoint, setAwayPoint] = useState(0);
   const [gameStart, setGameStart] = useState(null);
   const [scorelist, setScorelist] = useState([]);
-  const [homeMemberNames, setHomeMemberNames] = useState([]);
-  const [awayMemberNames, setAwayMemberNames] = useState([]);
+  let [homeMemberNames, setHomeMemberNames] = useState([]);
+  let [awayMemberNames, setAwayMemberNames] = useState([]);
 
   function retrieveGameMembers(id){   
-    console.log('id', id);
+
     if(id !== ''){
       fetch('/api/retrievegamemembers.php', {
         method: 'POST',
